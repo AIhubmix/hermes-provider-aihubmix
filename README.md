@@ -68,8 +68,13 @@ is the default recommendation.
 `hermes plugins install AIhubmix/hermes-provider-aihubmix` clones and passes the
 security scan, but it installs to `$HERMES_HOME/plugins/<repo-name>/` — and
 model providers are discovered from `$HERMES_HOME/plugins/model-providers/`
-only. The plugin lands on disk and never registers. Verified against 0.20.5;
-the two paths above are the ones that work.
+only. The plugin lands on disk and never registers.
+
+The manifest says otherwise: `aihubmix/plugin.yaml` declares
+`kind: model-provider`. `_install_plugin_core()` in `hermes_cli/plugins_cmd.py`
+does not read that field when it picks a destination, so the install reports
+success and only warns that the repository root has no `plugin.yaml`. Verified
+against 0.20.5; the two paths above are the ones that work.
 
 ## Set an API key
 
@@ -83,7 +88,7 @@ variable up, and `hermes doctor` probes it against the live catalog.
 ## Use it
 
 ```bash
-hermes --provider aihubmix --model claude-sonnet-5
+hermes --provider aihubmix --model gpt-5.6-sol
 ```
 
 Or pick a model interactively with `/model` after selecting AIHubMix.
