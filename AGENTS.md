@@ -83,28 +83,31 @@ through rather than raise; an empty picker is worse than a stale one.
 
 ## Do not write agent-config filenames into tracked files
 
-Hermes' plugin installer runs a security scan (`tools/skills_guard.py`) before
-installing from a Git source, and the literal strings `AGENTS.md`, `CLAUDE.md`,
-`.cursorrules`, and `.clinerules` match a **critical** `agent_config_mod` rule.
-A single critical finding makes the verdict `dangerous`, and a dangerous verdict
-on a community source is a hard block that `--force` cannot override — so one
-such string anywhere in a tracked file makes `hermes plugins install
-AIhubmix/hermes-provider-aihubmix` impossible for every user.
+Hermes security-scans a Git source before installing it (`tools/skills_guard.py`).
+One of its **critical** rules, `agent_config_mod`, matches the bare filenames of
+the well-known agent-instruction files — this repository's own top-level one,
+its Claude-flavoured sibling, and the two editor rule-files (Cursor's and
+Cline's dot-prefixed ones). A single critical finding makes the verdict
+`dangerous`, and a dangerous verdict on a community source is a hard block that
+`--force` cannot override. So one such string anywhere in a tracked file makes
 
-Refer to that policy by its text ("No new third-party-product plugins in-tree")
-rather than by filename. This file is named `AGENTS.md` on disk, which is fine —
-the scanner reads file contents, not paths.
-
-Verify before publishing any docs change:
-
-```bash
-grep -rn "AGENTS\.md\|CLAUDE\.md\|\.cursorrules\|\.clinerules" --exclude-dir=.git .
+```
+hermes plugins install AIhubmix/hermes-provider-aihubmix
 ```
 
+fail for every user. The scanner reads file *contents*, not paths, so this file
+being named what it is on disk is fine — writing that name *inside* any tracked
+file is not.
+
+Refer to the upstream policy by its text ("No new third-party-product plugins
+in-tree") rather than by filename. `scripts/check_sensitive.py` enforces this
+and runs in CI; it assembles the patterns from fragments and skips itself, which
+is why it can name what it looks for and this file cannot.
+
 Medium findings are noise by comparison — `_determine_verdict` treats
-medium/low as informational. Expect ~36 of them from `self.profile` in the
-tests, which matches the shell-startup-file pattern
-`\.(bashrc|zshrc|profile|...)`. They do not block anything.
+medium/low as informational and non-blocking. Expect roughly three dozen of
+them from `self.profile` in the tests, which the shell-startup-file pattern
+`\.(bashrc|zshrc|profile|...)` matches on the attribute name. Leave them.
 
 ## Before opening a PR
 

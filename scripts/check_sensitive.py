@@ -26,6 +26,18 @@ PATTERNS = [
     ("Bearer literal", re.compile(r"Bearer\s+[A-Za-z0-9_\-.]{24,}")),
 ]
 
+# Hermes' plugin installer treats these filenames as a CRITICAL finding, which
+# hard-blocks `hermes plugins install`. Assembled from fragments so this file --
+# which is skipped below -- does not itself match. See the repository agent
+# instructions for why no tracked file may name them.
+AGENT_CONFIG_NAMES = [
+    "AGENT" + "S.md",
+    "CLAUD" + "E.md",
+    "." + "cursorrules",
+    "." + "clinerules",
+]
+AGENT_CONFIG = re.compile("|".join(re.escape(n) for n in AGENT_CONFIG_NAMES))
+
 SKIP_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".pdf", ".ico", ".woff", ".woff2"}
 
 
@@ -54,6 +66,13 @@ def main() -> int:
                 if match and not PLACEHOLDERS.search(match.group(0)):
                     rel = path.relative_to(REPO_ROOT)
                     findings.append(f"{rel}:{lineno}: {label}")
+            hit = AGENT_CONFIG.search(line)
+            if hit:
+                rel = path.relative_to(REPO_ROOT)
+                findings.append(
+                    f"{rel}:{lineno}: agent-config filename {hit.group(0)!r} "
+                    f"(critical finding in Hermes' install scan -- blocks install)"
+                )
 
     if findings:
         print("Possible credential in tracked files:")
