@@ -59,8 +59,17 @@ pip install git+https://github.com/AIhubmix/hermes-provider-aihubmix.git
 ```
 
 Entry-point plugins are opt-in: Hermes only loads the ones named in the
-`plugins.enabled` list, so add `aihubmix` there. The drop-in path has no such
-gate, which is why it is the default recommendation.
+`plugins.enabled` list. Run `hermes plugins enable aihubmix` to add it (it
+writes the config for you). The drop-in path has no such gate, which is why it
+is the default recommendation.
+
+### Not `hermes plugins install`
+
+`hermes plugins install AIhubmix/hermes-provider-aihubmix` clones and passes the
+security scan, but it installs to `$HERMES_HOME/plugins/<repo-name>/` — and
+model providers are discovered from `$HERMES_HOME/plugins/model-providers/`
+only. The plugin lands on disk and never registers. Verified against 0.20.5;
+the two paths above are the ones that work.
 
 ## Set an API key
 
