@@ -55,6 +55,26 @@ something seems to need a Hermes core change, that is a signal to widen the
 generic hook surface upstream — not to patch core from here, and not to
 special-case this provider in a fork.
 
+## The version-tolerance code is not dead code
+
+Three places introspect core instead of assuming its shape:
+
+- `_supported_kwargs()` filters profile kwargs through `dataclasses.fields()`
+- `_inherited_fetch()` passes only the kwargs `super().fetch_models` accepts
+- `_url_opener()` imports `hermes_cli.urllib_security` behind a guard
+
+On a current Hermes build all three take the modern branch, so they read like
+no-ops. They are not. A published plugin cannot pin the Hermes build it is
+installed into, and the failure mode when one of these is wrong is nasty: the
+plugin loader swallows the import-time exception, the provider silently fails
+to register, and the user sees "unknown provider" with nothing in the logs
+pointing at the cause.
+
+This was not theoretical. All three were found against a real 0.15.1 install
+that lacked `supports_vision`, lacked `base_url` on `fetch_models`, and had no
+`urllib_security` module at all. Tests cover both a modern and a legacy stub
+profile — if you remove a branch, a legacy test fails. That is the intent.
+
 ## Degrade, don't fail
 
 Catalog fetches have three tiers: annotated catalog → plain `/v1/models` →

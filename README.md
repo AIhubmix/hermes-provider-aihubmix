@@ -20,6 +20,23 @@ the standing policy in the Hermes `AGENTS.md` ("No new third-party-product
 plugins in-tree", June 2026). Standalone plugin repos are the supported path,
 and they need nothing special from core.
 
+## Hermes version
+
+**Required:** any Hermes build with the model-provider plugin system — the
+plugin only needs `providers.register_provider` and `providers.base.ProviderProfile`.
+There is deliberately no version pin.
+
+**Verified on:** 0.15.1 and 0.20.5 — the same code, unmodified, across roughly
+14,800 commits of core drift. The plugin introspects every contact point with
+core rather than assuming a shape, so newer fields (`supports_vision`), newer
+signatures (`fetch_models(base_url=...)`), and newer modules
+(`hermes_cli.urllib_security`) are used when present and skipped when absent.
+
+**Recommended:** run a recent Hermes. Not because this plugin needs it — older
+builds carry their own unrelated bugs. On 0.15.1, for example, `hermes -z`
+returns no response for *any* provider, bundled ones included; that is fixed
+in current builds.
+
 ## Install
 
 ### Drop-in (recommended)
