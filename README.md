@@ -15,9 +15,10 @@ added to model requests.
 ## Why this lives outside the Hermes tree
 
 Hermes closes PRs that add third-party product integrations under `plugins/`
-in the main repo — a coupling-and-maintenance decision, not a quality bar. See
-the standing policy in the Hermes `AGENTS.md` ("No new third-party-product
-plugins in-tree", June 2026). Standalone plugin repos are the supported path,
+in the main repo — a coupling-and-maintenance decision, not a quality bar. The
+standing policy lives in the Hermes repository's contributor-instructions file
+and reads "No new third-party-product plugins in-tree" (June 2026), so search
+that phrase for the current wording. Standalone plugin repos are the supported path,
 and they need nothing special from core.
 
 ## Hermes version

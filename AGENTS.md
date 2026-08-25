@@ -81,6 +81,31 @@ Catalog fetches have three tiers: annotated catalog → plain `/v1/models` →
 curated `fallback_models`. Keep it that way. Any new fetch path must fall
 through rather than raise; an empty picker is worse than a stale one.
 
+## Do not write agent-config filenames into tracked files
+
+Hermes' plugin installer runs a security scan (`tools/skills_guard.py`) before
+installing from a Git source, and the literal strings `AGENTS.md`, `CLAUDE.md`,
+`.cursorrules`, and `.clinerules` match a **critical** `agent_config_mod` rule.
+A single critical finding makes the verdict `dangerous`, and a dangerous verdict
+on a community source is a hard block that `--force` cannot override — so one
+such string anywhere in a tracked file makes `hermes plugins install
+AIhubmix/hermes-provider-aihubmix` impossible for every user.
+
+Refer to that policy by its text ("No new third-party-product plugins in-tree")
+rather than by filename. This file is named `AGENTS.md` on disk, which is fine —
+the scanner reads file contents, not paths.
+
+Verify before publishing any docs change:
+
+```bash
+grep -rn "AGENTS\.md\|CLAUDE\.md\|\.cursorrules\|\.clinerules" --exclude-dir=.git .
+```
+
+Medium findings are noise by comparison — `_determine_verdict` treats
+medium/low as informational. Expect ~36 of them from `self.profile` in the
+tests, which matches the shell-startup-file pattern
+`\.(bashrc|zshrc|profile|...)`. They do not block anything.
+
 ## Before opening a PR
 
 ```bash
