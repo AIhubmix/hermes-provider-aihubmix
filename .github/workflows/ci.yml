@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Scan for committed credentials
+        run: python3 scripts/check_sensitive.py
+      - name: Run offline tests
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Verify the package builds
+        run: |
+          python3 -m pip install --upgrade build
+          python3 -m build

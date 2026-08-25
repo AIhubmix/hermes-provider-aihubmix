@@ -1,0 +1,5 @@
+name: aihubmix-provider
+kind: model-provider
+version: 0.1.0
+description: AIHubMix — unified API for 400+ models (OpenAI-compatible)
+author: AIHubMix

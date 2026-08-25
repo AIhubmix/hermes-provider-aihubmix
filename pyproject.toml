@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hermes-provider-aihubmix"
+version = "0.1.0"
+description = "Official AIHubMix model-provider plugin for Hermes Agent"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = { text = "MIT" }
+authors = [{ name = "AIHubMix" }]
+keywords = [
+    "hermes-agent",
+    "hermes-plugin",
+    "model-provider",
+    "aihubmix",
+    "llm",
+    "openai-compatible",
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/AIhubmix/hermes-provider-aihubmix"
+Issues = "https://github.com/AIhubmix/hermes-provider-aihubmix/issues"
+AIHubMix = "https://aihubmix.com"
+
+# Hermes discovers pip-installed providers through this group. A bare module
+# target self-registers on import; the loader skips callables that need
+# arguments, so no register() shim is needed here.
+[project.entry-points."hermes_agent.plugins"]
+aihubmix = "aihubmix"
+
+[tool.setuptools]
+packages = ["aihubmix"]
+
+[tool.setuptools.package-data]
+aihubmix = ["plugin.yaml"]
