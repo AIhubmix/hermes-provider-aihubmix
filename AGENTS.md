@@ -24,6 +24,30 @@ not advertise a capability, treat the model as not having it and let it drop
 out of the list. Silently promoting a model into the picker on a guessed
 capability produces a runtime 4xx the user cannot diagnose.
 
+## One provider entry, chat_completions only
+
+AIHubMix also exposes an Anthropic Messages endpoint at
+`https://aihubmix.com/v1/messages`, and it accepts every model in the catalog,
+not just Claude ones. Registering a second `anthropic_messages` profile for it
+is therefore technically possible. Do not.
+
+Hermes' own bundled aggregator plugins settle this: OpenRouter ships a single
+`chat_completions` entry even though `https://openrouter.ai/api/v1/messages`
+exists. The profiles that declare `api_mode="anthropic_messages"` — anthropic,
+minimax — are first-party vendor APIs whose default route is already the
+Anthropic protocol, not aggregators. The ecosystem convention is: aggregators
+expose one OpenAI-compatible entry.
+
+A second entry would also be indistinguishable from the first in the picker.
+Both would list the same models over the same credentials, differing only in
+wire protocol, which is not a distinction a user should have to make.
+
+If native Messages support becomes worth having — prompt-cache accounting is
+the plausible motivation — the right move is to ask upstream to open up
+per-model wire selection as a profile hook. Hermes already does exactly this
+for Nous Portal (`nous_api_mode(model)` in `agent/agent_init.py`), but it is
+hardcoded in core with no plugin-facing equivalent. Get the hook, then use it.
+
 ## Stay out of Hermes core
 
 The plugin declares a `ProviderProfile` and overrides documented hooks. If
