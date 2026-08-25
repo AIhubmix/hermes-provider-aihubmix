@@ -76,6 +76,11 @@ does not read that field when it picks a destination, so the install reports
 success and only warns that the repository root has no `plugin.yaml`. Verified
 against 0.20.5; the two paths above are the ones that work.
 
+Filed upstream as
+[NousResearch/hermes-agent#94664](https://github.com/NousResearch/hermes-agent/issues/94664),
+with a proposed fix. If that lands, `hermes plugins install` becomes a third
+supported path and this note goes away.
+
 ## Set an API key
 
 ```bash
