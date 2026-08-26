@@ -12,6 +12,13 @@ auto-wire from the provider registry.
 Maintained by AIHubMix. No affiliate, referral, or attribution headers are
 added to model requests.
 
+Listed in the [Hermes community plugin index](https://github.com/Revell-ai/hermes-plugin-index)
+(entry `aihubmix`). The index is what `hermes plugins install <bare-name>` and
+`hermes plugins search` are meant to read, but the client's default index URL
+still points at a repository that does not exist yet, so bare-name lookups fall
+back to a bundled seed list and cannot see this entry. Use one of the install
+paths below.
+
 ## Why this lives outside the Hermes tree
 
 Hermes closes PRs that add third-party product integrations under `plugins/`
