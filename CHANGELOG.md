@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Manifest `name` is now `aihubmix`, matching the pip entry point, the
+  community index entry, and the provider id the registry exposes. Directory
+  installs previously landed in `plugins/aihubmix-provider/` while every other
+  identifier for this plugin was `aihubmix`.
+
 ## 0.1.0
 
 - Initial release: registers AIHubMix as the `aihubmix` model provider for
