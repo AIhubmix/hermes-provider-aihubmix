@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Ships `after-install.md`, which replaces the generic install panel with the
+  one step a directory install still needs (moving the plugin into
+  `~/.hermes/plugins/model-providers/`) and notes that the enable prompt that
+  follows does not apply. Remove once
+  NousResearch/hermes-agent#76387 lands.
 - Manifest `name` is now `aihubmix`, matching the pip entry point, the
   community index entry, and the provider id the registry exposes. Directory
   installs previously landed in `plugins/aihubmix-provider/` while every other
