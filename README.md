@@ -12,12 +12,10 @@ auto-wire from the provider registry.
 Maintained by AIHubMix. No affiliate, referral, or attribution headers are
 added to model requests.
 
-Listed in the [Hermes community plugin index](https://github.com/Revell-ai/hermes-plugin-index)
-(entry `aihubmix`). The index is what `hermes plugins install <bare-name>` and
-`hermes plugins search` are meant to read, but the client's default index URL
-still points at a repository that does not exist yet, so bare-name lookups fall
-back to a bundled seed list and cannot see this entry. Use one of the install
-paths below.
+Listed in the official Hermes plugin catalog as `aihubmix` (`plugin-catalog/aihubmix.yaml`
+in the Hermes tree, landed 2026-09-17), so `hermes plugins search aihubmix` and
+`hermes plugins install aihubmix` resolve the bare name on builds that read the
+live catalog.
 
 ## Why this lives outside the Hermes tree
 
@@ -34,8 +32,9 @@ and they need nothing special from core.
 plugin only needs `providers.register_provider` and `providers.base.ProviderProfile`.
 There is deliberately no version pin.
 
-**Verified on:** 0.15.1 and 0.20.5 — the same code, unmodified, across roughly
-14,800 commits of core drift. The plugin introspects every contact point with
+**Verified on:** 0.15.1, 0.20.5 and 0.21.3 — the same code, unmodified, across
+roughly 28,100 commits of core drift (13,327 of them between 0.20.5 and 0.21.3
+alone). The plugin introspects every contact point with
 core rather than assuming a shape, so newer fields (`supports_vision`), newer
 signatures (`fetch_models(base_url=...)`), and newer modules
 (`hermes_cli.urllib_security`) are used when present and skipped when absent.
@@ -47,7 +46,12 @@ in current builds.
 
 ## Install
 
-### Drop-in (recommended)
+Three supported paths. On a build newer than 0.20.5, `hermes plugins install
+aihubmix` is one command and is the one to use. The drop-in works on every
+build that has the model-provider plugin system at all, so it stays the
+fallback for older Hermes.
+
+### Drop-in (works on any build)
 
 ```bash
 git clone https://github.com/AIhubmix/hermes-provider-aihubmix.git
@@ -67,28 +71,35 @@ pip install git+https://github.com/AIhubmix/hermes-provider-aihubmix.git
 
 Entry-point plugins are opt-in: Hermes only loads the ones named in the
 `plugins.enabled` list. Run `hermes plugins enable aihubmix` to add it (it
-writes the config for you). The drop-in path has no such gate, which is why it
-is the default recommendation.
+writes the config for you). Neither the drop-in nor the catalog install has
+that gate.
 
-### Not `hermes plugins install`
+### `hermes plugins install` (one command, needs a recent build)
 
-`hermes plugins install AIhubmix/hermes-provider-aihubmix` clones and passes the
-security scan, but it installs to `$HERMES_HOME/plugins/<repo-name>/` — and
-model providers are discovered from `$HERMES_HOME/plugins/model-providers/`
-only. The plugin lands on disk and never registers.
+```bash
+hermes plugins install aihubmix
+```
 
-The manifest says otherwise: `aihubmix/plugin.yaml` declares
-`kind: model-provider`. `_install_plugin_core()` in `hermes_cli/plugins_cmd.py`
-does not read that field when it picks a destination, so the install reports
-success and only warns that the repository root has no `plugin.yaml`. Verified
-against 0.20.5; the two paths above are the ones that work.
+Resolves the bare name against the official catalog, clones at the pinned
+commit, and lands the plugin at `$HERMES_HOME/plugins/aihubmix/`. No move, no
+config edit. Verified end-to-end on 0.21.3 in a clean `HERMES_HOME`: the
+provider loads from the installed directory itself, not from a pip copy.
 
-Tracked upstream as
-[NousResearch/hermes-agent#76372](https://github.com/NousResearch/hermes-agent/issues/76372);
-a fix is proposed in
-[#76387](https://github.com/NousResearch/hermes-agent/pull/76387), still open at
-the time of writing. If that lands, `hermes plugins install` becomes a third
-supported path and this note goes away.
+This path was broken until recently and the repair has two halves, both merged
+upstream after 0.20.5:
+
+- **Discovery** — provider lookup now also walks the flat
+  `$HERMES_HOME/plugins/<name>/` directory the installer clones into, importing
+  entries whose manifest declares `kind: model-provider`
+  ([#76372](https://github.com/NousResearch/hermes-agent/issues/76372), landed
+  2026-09-02 via #101456). Plugins already installed the broken way start
+  working on upgrade.
+- **Name resolution** — bare-name lookups read the live catalog instead of the
+  bundled seed list, which never contained third-party entries.
+
+On 0.20.5 and earlier, neither half is present: the bare name does not resolve,
+and a clone by URL lands where nothing discovers it. Use one of the two paths
+above, or upgrade.
 
 ## Set an API key
 
